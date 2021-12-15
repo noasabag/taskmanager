@@ -1,9 +1,8 @@
 const mongoose = require('mongoose') 
 
-
-mongoose.connect('mongodb://127.0.0.1:27017/mongoose-api' /*{UseNewUrlParser: true, useCreateIndex: true } */)
+console.log(process.env.MONGODB)
+mongoose.connect( process.env.MONGODB /*{UseNewUrlParser: true, useCreateIndex: true } */)
 console.log("success conect tomongodb");
-
 /*
 const me = new User({
     name:'noa' ,

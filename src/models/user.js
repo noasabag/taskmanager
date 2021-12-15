@@ -34,9 +34,12 @@ password:{
         if(value.lenght<7|| value.includes('password'))
         throw new Error('invalid password')
     
-    }
-
+    },
 },
+profile:{
+    type:Buffer
+} ,
+
 tokens:[{
   toke:  
         {
@@ -46,7 +49,7 @@ tokens:[{
     
 }] 
 }, {timestamps: true})
- userschema.methods.jwtparser = function jwtparser () { const jstt=  jwt.sign({_id:this._id.toString()},'noasa')
+ userschema.methods.jwtparser = function jwtparser () { const jstt=  jwt.sign({_id:this._id.toString()},process.env.JWT_SECRET)
  this.tokens.push({toke:jstt})
  //this.tokens =this.tokens.concat({toke:jstt})
  this.save()

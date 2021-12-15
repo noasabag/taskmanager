@@ -6,11 +6,14 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const auth = require('../src/middleware/Authorization.js');
 const multer = require('multer')
+const sharp = require('sharp')
+const email= require('../src/emails/send.js')
 userrouter.delete('/user/me',auth ,async(req,res)=>{
 
     try{
         //await req.user.deleteOne({ _id: req.user._id });
         req.user.remove()
+        email.goodbye(req.user.name, req.user.email)
             res.status(200).send('deleted'+req.user)
     }
     catch(e){
@@ -60,6 +63,7 @@ userrouter.post('/user', async (req,res)=>{
     try{
         await user.save()
         const jwsent = user.jwtparser()
+        email.welcome(user.name, user.email)
         res.status(200).send('Success!'+ user+ '' + jwsent)
     }
     catch(e){
@@ -91,9 +95,6 @@ userrouter.get('/user/:me' ,auth,async (req,res)=>{
     res.send(req.user)
 })
 
-
-
-
 userrouter.patch('/user/me', auth , async (req,res)=>{
    
 
@@ -118,22 +119,51 @@ catch(e){
 }
 })
 
-
-
 const upload = multer({
-     dest: 'avatar',
     limits:{
-        fileSize:1000000	
+        fileSize:5000000	
     },
     fileFilter(req, file, cb){
-        file.originalname.match()
-
+       if(file.originalname.match(/\.(JPG|JPEG|PNG)$/)){
+        return cb(undefined, true)
+         }
+        cb( new Error('upload only img'))
     }
     })
 
-userrouter.post('/user/me/avatar',upload.single('avatar'), async (req,res)=>{
-    res.send()
+userrouter.post('/user/me/avatar',auth ,upload.single('avatar'), async (req,res)=>{
+    const buffer = req.file.buffer.sharp().resize({width:250, height:250}).toFile('png').toBuffer()
+   req.user.profile= buffer
+   await req.user.save()
+      res.send()
+} , (error, req, res,next)=>{
+
+    res.status(500).send({error:error.message})
 })
 
+
+userrouter.delete('/user/me/delete/avatar',auth , async (req,res)=>{
+req.user.profile=undefined
+await req.user.save()
+res.send('deleted')
+} )
+
+userrouter.get('/user/me/:id/avatar', async(req,res)=>{
+    try{
+    const user = await User.findById(req.params.id)
+    if (!user || !user.profile)
+    {
+    throw new Error('cant find user e this id')
+    }
+    res.set('Content-Type', 'image/png')
+
+     return res.send(user.profile)
+    }
+    catch(e){
+        res.status(500).send(e)
+    }
+
+
+})
 
 module.exports= userrouter;
