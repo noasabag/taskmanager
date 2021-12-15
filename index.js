@@ -33,7 +33,7 @@ const main =  async ()=>{
 main()
 
 
-const port =( process.env.PORT)
+const port =process.env.PORT
 app.listen(port,()=>console.log('Hello YOURE ON PORT' + port))
 
 
