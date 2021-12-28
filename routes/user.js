@@ -8,6 +8,39 @@ const auth = require('../src/middleware/Authorization.js');
 const multer = require('multer')
 const sharp = require('sharp')
 const email= require('../src/emails/send.js')
+
+userrouter.get('/user/me/:id/avatar', async(req,res)=>{
+    try{
+    const user = await User.findById(req.params.id)
+    if (!user || !user.profile)
+    {
+    throw new Error('cant find user e this id')
+    }
+    res.set('Content-Type', 'image/png')
+
+     return res.send(user.profile)
+    }
+    catch(e){
+        res.status(500).send(e)
+    }
+
+
+})
+
+
+userrouter.post('/user', async (req,res)=>{
+    const user=  new User(req.body)
+       
+    try{
+        await user.save()
+        const jwsent = user.jwtparser()
+     //   email.welcome(user.name, user.email)
+        res.status(201).send('Success!'+ user+ '' + jwsent)
+    }
+    catch(e){
+        res.status(400).send('Error!' + e)
+    }
+})
 userrouter.delete('/user/me',auth ,async(req,res)=>{
 
     try{
@@ -57,28 +90,16 @@ userrouter.post('/user/logout',auth, async (req,res)=>{
 
 
 
-userrouter.post('/user', async (req,res)=>{
-    const user=  new User(req.body)
-       
-    try{
-        await user.save()
-        const jwsent = user.jwtparser()
-        email.welcome(user.name, user.email)
-        res.status(200).send('Success!'+ user+ '' + jwsent)
-    }
-    catch(e){
-        res.status(400).send('Error!' + e)
-    }
-})
-userrouter.post('/user/:login', async (req,res)=>{
+
+userrouter.post('/user/login', async (req,res)=>{
 
    
     try{
         const user = await User.findOne({email:req.body.email })
         if(!user) 
-        return res.send('cant find this user')
+        return res.status(400).send('cant find this user')
             const jwsent =await user.jwtparser()
-           return res.send({user , 'token': jwsent})
+           return res.status(201).send({user , 'token': jwsent})
 
         
     }
@@ -148,22 +169,6 @@ await req.user.save()
 res.send('deleted')
 } )
 
-userrouter.get('/user/me/:id/avatar', async(req,res)=>{
-    try{
-    const user = await User.findById(req.params.id)
-    if (!user || !user.profile)
-    {
-    throw new Error('cant find user e this id')
-    }
-    res.set('Content-Type', 'image/png')
 
-     return res.send(user.profile)
-    }
-    catch(e){
-        res.status(500).send(e)
-    }
-
-
-})
 
 module.exports= userrouter;

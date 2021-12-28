@@ -4,7 +4,23 @@ const taskroute = new express.Router()
 const auth = require('../src/middleware/Authorization.js');
 const User = require('../src/models/user.js')
 
+taskroute.post('/task', auth ,async (req,res)=>{
+    const task=  new Task({
+        ...req.body,
+        owner: req.user._id
+      
 
+    })
+       
+    try{
+        await task.save()
+        console.log(req.user)
+        res.status(200).send('Success!'+ task)
+    }
+    catch(e){
+        res.status(400).send('Error!' + e)
+    }
+})
 
 taskroute.get('/tasks',auth, async (req,res)=>{
     
@@ -41,22 +57,7 @@ taskroute.get('/tasks',auth, async (req,res)=>{
     })
 
 
-taskroute.post('/task', auth ,async (req,res)=>{
-    const task=  new Task({
-        ...req.body,
-        owner: req.user._id
 
-    })
-       
-    try{
-        await task.save()
-        console.log(req.user)
-        res.status(200).send('Success!'+ task)
-    }
-    catch(e){
-        res.status(400).send('Error!' + e)
-    }
-})
 
     
 taskroute.get('/task/:id', auth ,  (async(req,res)=>{

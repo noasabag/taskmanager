@@ -5,14 +5,16 @@ const User = require('../models/user.js')
 
 const auth =  (async(req, res, next)=>{
     try{
-    const token = req.header('Authorization')
+        const token = req.header('Authorization')
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
+const user = await User.findOne({_id:decoded._id,'tokens.toke':token})
+console.log(user) 
 
-    const user = await User.findOne({_id:decoded._id,'tokens.toke':token})
 
 if (!user) throw new Error
 req.user =user
 req.auth = token
+console.log(req.user) 
     }
     catch(e){
         res.send('pls auth')
