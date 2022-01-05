@@ -95,8 +95,10 @@ userschema.methods.jwtparser = async function () {
 
 
 userschema.pre('save', async function (next) {
-
-    this.password = await bcrypt.hash(this.password, 8)
+    
+    if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 8)}
+    
     next();
 
 })
