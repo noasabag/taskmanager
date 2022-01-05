@@ -37,12 +37,11 @@ userrouter.post('/user/login', async (req, res) => {
             throw new Error('Unable to login')
         }
         
-         const isMatch = await bcrypt.compare( req.body.password ,await bcrypt.hash(req.body.password, 8))
+         const isMatch = await bcrypt.compare( req.body.password , user.password)
+
         if (!isMatch) {
-            console.log(await bcrypt.hash(req.body.password, 8))
             throw new Error('Unable to login')
         }
-        console.log(await bcrypt.hash(req.body.password, 8))
 
         const token = await user.jwtparser()
         res.send({ user, token })
