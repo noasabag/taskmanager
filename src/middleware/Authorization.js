@@ -1,25 +1,23 @@
 const jwt = require('jsonwebtoken');
-const { ObjectId } = require('mongodb');
 const User = require('../models/user.js')
 
 
-const auth =  (async(req, res, next)=>{
+const auth =  async(req, res, next)=>{
     try{
         const token = req.header('Authorization')
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 const user = await User.findOne({_id:decoded._id,'tokens.toke':token})
-console.log(user) 
 
 
-if (!user) throw new Error
+if (!user) {throw new Error()}
 req.user =user
 req.auth = token
-console.log(req.user) 
-    }
+next()
+}
     catch(e){
-        res.send('pls auth')
+        res.status(400).send('pls auth')
     }
-    next()
-})
+    
+}
 
 module.exports = auth

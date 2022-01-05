@@ -1,5 +1,5 @@
 
-const { Timestamp } = require('bson');
+
 const mongoose = require('mongoose') 
 
 
@@ -11,7 +11,7 @@ const taskschema = new mongoose.Schema( {
      },
      completed: {
          type: Boolean,
-         default:'false'
+         default: false
      }
      ,
      owner:{
