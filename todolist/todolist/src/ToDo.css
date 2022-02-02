@@ -1,0 +1,28 @@
+
+#main {
+  width: 600px;
+  margin: 0 auto;
+  text-align: left;
+}
+.ul {
+    list-style: none;
+    color: #5238c5;
+
+   
+ }
+ul li:hover {
+    background: rgba(221, 221, 221, 0.726);
+  }
+  html, body {
+    height: 100%;
+    color: #a461fb;
+    background: #aeccd1;
+  }
+    
+  .done {
+    color: rgb(184, 44, 44); 
+    text-decoration: line-through;
+     list-style: '\2713'; 
+  }
+  
+  
